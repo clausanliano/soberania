@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Soberania</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #e0f7fa; }
+    canvas { display: block; margin: 0 auto; background: #fff; border: 2px solid #000; }
+  </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Soberania !!!</h1>
+    <canvas id="cnvJogo" width="800" height="600"></canvas>
+    <div style="text-align: center; margin-top: 40px;">
+        <button id="btnIniciar" style="padding: 15px 30px; font-size: 18px; cursor: pointer;">
+            Iniciar
+        </button>
+    </div>
+    
+<script>
+
+class CarregadorImagens {
+  static carregar(lista_marcas, nome_pasta, funcao_callback) {
+    let images = [];
+    let loaded = 0;
+
+    lista_marcas.forEach(marca => {
+      const img = new Image(100, 100);
+      img.src = nome_pasta + marca + '.png';
+      img.onload = () => {
+        images.push(img);
+        loaded++;
+        if (loaded === lista_marcas.length) {
+          funcao_callback(images);
+        }
+      };
+    });
+  }
+}
+
+class Jogador {
+  constructor(img, x, y) {
+    this.img = img;
+    this.x = x;
+    this.y = y;
+    this.width = 60;
+    this.height = 60;
+    this.velocidade = 7;
+    this.vidas = 2;
+  }
+
+  moverJogador(direction) {
+    if (direction === 'left') this.x -= this.velocidade;
+    else if (direction === 'right') this.x += this.velocidade;
+    this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
+  }
+
+  desenhaAvatar(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+}
+
+class Logotipo {
+  constructor(img, paisEmpresa) {
+    this.img = img;
+    this.paisEmpresa = paisEmpresa; // 'china' ou 'eua'
+    this.x = Math.random() * (canvas.width - 50);
+    this.y = -50;
+    this.size = 30 + Math.random() * 50;
+    this.velocidade = 3 + Math.random() * 5;
+  }
+
+  atualizaLogo() {
+    this.y += this.velocidade;
+  }
+
+  desenhaLogotipo(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.size, this.size);
+  }
+
+  verificaColisao(jogador) {
+    return this.x < jogador.x + jogador.width &&
+           this.x + this.size > jogador.x &&
+           this.y < jogador.y + jogador.height &&
+           this.y + this.size > jogador.y;
+  }
+}
+
+class Jogo {
+  constructor(ctx) {
+    this.ctx = ctx; // contexto do Canva (CanvasRenderingContext2D)
+    this.avatar = new Image();
+    this.avatar.src = 'boneco.png';
+    this.jogador = new Jogador(this.avatar, 400, 500);
+    this.chinaLogos = [];
+    this.euaLogos = [];
+    this.logos = [];
+    this.keys = {};
+    this.frequenciaCriacaoLogo = 100;
+    this.timer = 0;
+    this.nivel = 1;
+
+    this.avatar.onload = () => this.loop(); //quando carregar o boneco 
+
+    document.addEventListener('keydown', e => this.keys[e.key] = true);
+    document.addEventListener('keyup', e => this.keys[e.key] = false);
+
+    const marcas_china = ['byd', 'huawei', 'luxgen', 'faw', 'hongqi', 'baic', 'dfm', 'great_wall', 'brilliance', 'haima', 'qoros'];
+    CarregadorImagens.carregar(marcas_china, 'logos/china/', imgs => this.chinaLogos = imgs);
+
+    const marcas_eua = ['bic', 'fedex', 'bmw', 'dell', 'texaco', 'colgate', 'mobil', 'visa', 'mastercard', 'paypal', 'american_express'];
+    CarregadorImagens.carregar(marcas_eua, 'logos/eua/', imgs => this.euaLogos = imgs);
+
+  }
+
+  atualizaJogo() {
+    if (this.keys['ArrowLeft']) this.jogador.moverJogador('left');
+    if (this.keys['ArrowRight']) this.jogador.moverJogador('right');
+
+    this.timer++;
+    if (this.timer % this.frequenciaCriacaoLogo === 0) {
+      this.geraLogo();
+    }
+
+    this.logos.forEach(logo => logo.atualizaLogo());
+    this.processaColisao();
+    this.apagaLogoFinalTela();
+
+    // Aumenta dificuldade a cada 10s
+    if (this.timer % 600 === 0 && this.frequenciaCriacaoLogo > 20) {
+      this.nivel++;
+      this.frequenciaCriacaoLogo -= 10;
+    }
+  }
+
+  desenhaJogo() {
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.jogador.desenhaAvatar(this.ctx);
+    this.logos.forEach(logo => logo.desenhaLogotipo(this.ctx));
+    this.ctx.fillStyle = '#000';
+    this.ctx.font = '20px Arial';
+    this.ctx.fillText(`Vidas: ${this.jogador.vidas}`, 10, 20);
+    this.ctx.fillText(`Nível: ${this.nivel}`, 700, 20);
+  }
+
+  geraLogo() {
+    const nomePais = Math.random() < 0.1 ? 'china' : 'eua';
+    const img = nomePais === 'china' ? this.escolherLogoAleatoriamente(this.chinaLogos) : this.escolherLogoAleatoriamente(this.euaLogos);
+    this.logos.push(new Logotipo(img, nomePais));
+  }
+
+  escolherLogoAleatoriamente(listaLogotipo) {
+    return listaLogotipo[Math.floor(Math.random() * listaLogotipo.length)];
+  }
+
+  processaColisao() {
+    this.logos.forEach((logo, idx) => {
+      if (logo.verificaColisao(this.jogador)) {
+        if (logo.paisEmpresa === 'china') {
+            this.jogador.vidas++;
+        } else { 
+            this.jogador.vidas-=2;
+        }
+        this.logos.splice(idx, 1);  // se colidiu no avatar, apague
+      }
+    });
+  }
+
+  apagaLogoFinalTela() {
+    this.logos = this.logos.filter(item => item.y < canvas.height); // se colidiu na base, apague
+  }
+
+  loop() {
+    if (this.jogador.vidas <= 0) {
+      this.ctx.fillStyle = '#f00';
+      this.ctx.font = '50px Arial';
+      this.ctx.fillText('GAME OVER', 250, 300);
+      return;
+    }
+    this.atualizaJogo();
+    this.desenhaJogo();
+    requestAnimationFrame(() => this.loop()); //criar animações suaves e eficientes no navegador 60hz
+  }
+}
+
+const canvas = document.getElementById('cnvJogo');
+new Jogo(canvas.getContext('2d'));
+
+const btnIniciar = document.getElementById('btnIniciar');
+btnIniciar.onclick = () => {
+  // Cria uma nova instância do jogo (reinicia)
+  new Jogo(canvas.getContext('2d'));
+};
+
+</script>
+</body>
+</html>
