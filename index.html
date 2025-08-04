@@ -17,12 +17,12 @@
     <!-- 🔰 Tela Inicial com Regras -->
     <div id="telaInicial">
       <h2>📜 Origem do Jogo</h2>
-      <p>Este jogo foi desenvolvido como trabalho final do <strong>curso de JavaScript básico</strong>, ministrado pelo professor <strong>Kelyson Nunes</strong> (contratem ele, o homem é bom!).</p>
+      <p>Este jogo foi desenvolvido para PC, como trabalho final do <strong>curso de JavaScript básico</strong>, ministrado pelo professor <strong>Kelyson Nunes</strong> (contratem ele, o homem é bom!).</p>
       <p>A proposta do jogo surgiu de forma bem-humorada, como uma crítica criativa às <em>sanções norte-americanas</em> ao Brasil. A ideia divertida contribuiu (assim espero) para uma boa nota!</p>
 
       <h2>🎯 Objetivo da Publicação</h2>
       <p>Devido ao sucesso da apresentação em sala de aula, resolvi publicar este código para ajudar alguém que <strong>está realmente precisando</strong>.</p>
-      <p>Se você puder colaborar, doe qualquer valor para apoiar essa causa: <a href="https://www.vakinha.com.br/vaquinha/todos-por-rafinha" target="_blank">Todos por Rafinha - Clique aqui para doar</a>.</p>
+      <p>Se você puder colaborar, doe QUALQUER VALOR para apoiar essa causa: <a href="https://www.vakinha.com.br/vaquinha/todos-por-rafinha" target="_blank">Todos por Rafinha - Clique aqui para doar</a>.</p>
       <p><strong>Doe, compartilhe, divirta-se e ajude o próximo. Obrigado!</strong></p>
 
       <h2>🎮 Regras do Jogo</h2>
@@ -50,7 +50,7 @@ class CarregadorImagens {
 
     lista_marcas.forEach(marca => {
       const img = new Image(100, 100);
-      img.src = nome_pasta + marca + '.png';
+      img.src = nome_pasta + marca;
       img.onload = () => {
         images.push(img);
         loaded++;
@@ -61,36 +61,6 @@ class CarregadorImagens {
     });
   }
 }
-
-
-class CarregadorImagens2 {
-  static carregar(links_imagens, funcao_callback) {
-    let images = [];
-    let loaded = 0;
-
-    links_imagens.forEach(link => {
-      const img = new Image(100, 100);
-      img.src = link;
-      img.onload = () => {
-        images.push(img);
-        loaded++;
-        if (loaded === links_imagens.length) {
-          funcao_callback(images);
-        }
-      };
-      img.onerror = () => {
-        console.error(`Erro ao carregar imagem: ${link}`);
-        loaded++;
-        if (loaded === links_imagens.length) {
-          funcao_callback(images);
-        }
-      };
-    });
-  }
-}
-
-
-
 
 class Jogador {
   constructor(img, x, y) {
@@ -159,52 +129,26 @@ class Jogo {
     document.addEventListener('keydown', e => this.keys[e.key] = true);
     document.addEventListener('keyup', e => this.keys[e.key] = false);
 
-    //const marcas_china = ['byd', 'huawei', 'luxgen', 'faw', 'hongqi', 'baic', 'dfm', 'great_wall', 'brilliance', 'haima', 'qoros'];
-    //CarregadorImagens.carregar(marcas_china, 'logos/china/', imgs => this.chinaLogos = imgs);
-
-    //const marcas_eua = ['bic', 'fedex', 'bmw', 'dell', 'texaco', 'colgate', 'mobil', 'visa', 'mastercard', 'paypal', 'american_express'];
-    //CarregadorImagens.carregar(marcas_eua, 'logos/eua/', imgs => this.euaLogos = imgs);
-
-
-    const links_eua = [
-      "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-      "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Microsoft_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/UnitedHealth_Group%2C_Inc._logo.png",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Walmart_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Google_2015_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/ExxonMobil_Logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/IBM_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Cisco_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/McDonald%27s_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/PepsiCo_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Coca-Cola_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/General_Motors_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Dell_Technologies_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Visa_Inc._logo.svg",  
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Bic_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Shell_wordmark_2019.svg", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Walmart_logo_%282025%29.svg", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Apple_logo_black.svg", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Microsoft_logo.svg", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Google_2015_logo.svg", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/ExxonMobil_Logo.svg", 
+    const marcas_china = [
+      'alibaba.svg', 'baic.png', 'brilliance.png', 'byd.png', 'chery.svg', 'dfm.png',
+      'faw.png', 'great_wall.png', 'gwm.png', 'haima.png', 'hongqi.png', 'huawei.png',
+      'icar.svg', 'luxgen.png', 'qoros.png', 'shein.png', 'xcmg.svg'
     ];
 
-    CarregadorImagens2.carregar(links, imgs => this.chinaLogos = imgs);
+    CarregadorImagens.carregar(marcas_china, 'logos/china/', imgs => this.chinaLogos = imgs);
 
-    const linksChinese = [
-      "https://commons.wikimedia.org/wiki/Special:FilePath/BYD_Auto_2022_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Chery_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Great_Wall_Motor_2025_logo.png",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Shein-logo.png", 
-      "https://commons.wikimedia.org/wiki/Special:FilePath/Alibaba_en_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/XCMG_logo.svg",
-      "https://commons.wikimedia.org/wiki/Special:FilePath/ICar_logo.svg",
-      "https://upload.wikimedia.org/wikipedia/en/0/04/Huawei_Standard_logo.svg"
+    const marcas_eua = [
+      'amazon.svg', 'american_express.png', 'apple.svg', 'bic.png', 'bmw.png', 'cisco.svg',
+      'cocacola.svg', 'colgate.png', 'dell.png', 'exxon_mobil.svg', 'fedex.png', 'general_motors.svg',
+      'google.svg', 'ibm.svg', 'mastercard.png', 'mcconalds.svg', 'microsoft.svg', 'mobil.png',
+      'paypal.png', 'pepsico.svg', 'Shell.svg', 'texaco.png', 'united_health_group.png', 'visa.png',
+      'walmart.svg'
     ];
 
-    CarregadorImagens2.carregar(links, imgs => this.chinaLogos = imgs);
+    CarregadorImagens.carregar(marcas_eua, 'logos/eua/', imgs => this.euaLogos = imgs);
+
+
+
 
   }
 
